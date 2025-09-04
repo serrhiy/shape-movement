@@ -1,6 +1,28 @@
-#include <iostream>
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
+constexpr unsigned height = 600;
+constexpr unsigned width = 800;
+constexpr const char* title = "Shape movement";
 
 int main(const int argc, const char* argv[]) {
-  std::cout << "Hello world!\n";
+  if (!glfwInit()) return -1;
+
+  GLFWwindow* window = glfwCreateWindow(width, height, title, nullptr, nullptr);
+  if (!window) {
+    glfwTerminate();
+    return -1;
+  }
+
+  glfwMakeContextCurrent(window);
+  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) return -1;
+
+  while (!glfwWindowShouldClose(window)) {
+    glClear(GL_COLOR_BUFFER_BIT);
+    glfwSwapBuffers(window);
+    glfwPollEvents();
+  }
+
+  glfwTerminate();
   return 0;
 }

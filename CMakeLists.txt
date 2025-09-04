@@ -6,4 +6,5 @@ project(
   HOMEPAGE_URL https://github.com/serrhiy/shape-movement
   LANGUAGES CXX
 )
+add_subdirectory(lib)
 add_subdirectory(src)

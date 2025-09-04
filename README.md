@@ -4,17 +4,30 @@
 
 `sudo apt install libxinerama-dev libxcursor-dev xorg-dev libglu1-mesa-dev pkg-config`
 
-2. Add `CMakeUserPresets.json` in source directory:
+2. Add `CMakeUserPresets.json` to source directory:
 
 ```json
 {
   "version": 2,
   "configurePresets": [
     {
-      "name": "default",
+      "name": "release",
       "inherits": "vcpkg",
       "environment": {
-        "VCPKG_ROOT": "<path to vcpkg>"
+        "VCPKG_ROOT": "/home/serhii/vcpkg"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "debug",
+      "inherits": "vcpkg",
+      "environment": {
+        "VCPKG_ROOT": "/home/serhii/vcpkg"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
       }
     }
   ]
@@ -23,4 +36,7 @@
 
 3. Run CMake in source directory:
 
-`cmake --preset=default`
+```shell
+cmake --preset=release # or debug
+cmake --build build
+```

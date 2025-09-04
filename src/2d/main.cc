@@ -6,7 +6,7 @@
 
 constexpr unsigned height = 600;
 constexpr unsigned width = 800;
-constexpr const char* title = "Shape movement";
+constexpr const char* title = "Shape movement 2D";
 
 int main(const int argc, const char* argv[]) {
   if (!glfwInit()) return -1;

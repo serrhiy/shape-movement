@@ -2,7 +2,6 @@
 #include <GLFW/glfw3.h>
 
 #include <utils/defer.hh>
-#include <iostream>
 
 constexpr unsigned height = 600;
 constexpr unsigned width = 800;

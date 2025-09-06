@@ -3,12 +3,12 @@
 #include <fmt/format.h>
 #include <fmt/ranges.h>
 
-#include <string_view>
 #include <filesystem>
-#include <string>
-#include <source_location>
-#include <syslog.h>
 #include <iostream>
+#include <source_location>
+#include <string>
+#include <string_view>
+#include <syslog.h>
 
 namespace logger {
   using src_loc = std::source_location;
@@ -18,14 +18,12 @@ namespace logger {
   }
 
   void log(int level, std::string_view format, const src_loc& location, auto&&... args) {
-    const std::string message = fmt::format(
-      fmt::runtime(format),
-      std::forward<decltype(args)>(args)...
-    );
+    const std::string message =
+      fmt::format(fmt::runtime(format), std::forward<decltype(args)>(args)...);
     const std::filesystem::path full_path = location.file_name();
     syslog(level, "%s:%d %s", full_path.filename().c_str(), location.line(), message.c_str());
   }
-  
+
   auto logInfo(std::string_view format, const src_loc& location = src_loc::current()) {
     return [format, location](auto&&... args) {
       log(LOG_INFO, format, location, std::forward<decltype(args)>(args)...);
@@ -48,7 +46,7 @@ namespace logger {
     return [format, location](auto&&... args) {
       log(LOG_DEBUG, format, location, std::forward<decltype(args)>(args)...);
     };
-  };
+  }
 
   auto logTest(std::string_view format, const src_loc& location = src_loc::current()) {
     return [format, location](auto&&... args) {

@@ -1,11 +1,11 @@
-#include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <glad/glad.h>
 
 #include <functional>
 
+#include <logger/core.hh>
 #include <utils/defer.hh>
 #include <utils/functional.hh>
-#include <logger/core.hh>
 #include <version.hh>
 
 constexpr unsigned height = 600;

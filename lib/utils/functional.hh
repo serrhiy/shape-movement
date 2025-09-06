@@ -4,8 +4,6 @@
 
 namespace utils {
   std::function<void()> sequence(auto... functions) {
-    return [=]() {
-      (functions(), ...);
-    };
+    return [=]() { (functions(), ...); };
   }
 }

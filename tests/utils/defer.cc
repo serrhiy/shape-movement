@@ -6,9 +6,7 @@
 int main(const int argc, const char* argv[]) {
   int number = 0;
   const auto inc1 = [&number]() { number++; };
-  const auto inc2 = [](int& number) {
-    number++;
-  };
+  const auto inc2 = [](int& number) { number++; };
 
   {
     utils::defer d1{ inc1 };

@@ -5,3 +5,4 @@ function(addTest filename testname)
 endfunction()
 
 addTest(defer.cc utils_defer_test)
+addTest(sequence.cc utils_sequence_test)

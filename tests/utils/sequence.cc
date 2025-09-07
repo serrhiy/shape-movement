@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <functional>
 
 #include <utils/functional.hh>
 

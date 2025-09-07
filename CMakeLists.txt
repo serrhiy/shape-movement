@@ -7,6 +7,7 @@ project(
   LANGUAGES CXX
 )
 
+option(BUILD_TESTING "Build tests" OFF)
 include(CTest)
 
 add_subdirectory(lib)

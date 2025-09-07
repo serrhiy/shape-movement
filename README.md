@@ -14,7 +14,7 @@
       "name": "release",
       "inherits": "vcpkg",
       "environment": {
-        "VCPKG_ROOT": "<vcpkg_path>"
+        "VCPKG_ROOT": "/home/serhii/vcpkg"
       },
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release"
@@ -24,10 +24,11 @@
       "name": "debug",
       "inherits": "vcpkg",
       "environment": {
-        "VCPKG_ROOT": "<vcpkg_path>"
+        "VCPKG_ROOT": "/home/serhii/vcpkg"
       },
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug"
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_CXX_INCLUDE_WHAT_YOU_USE": "include-what-you-use"
       }
     }
   ]

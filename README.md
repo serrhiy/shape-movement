@@ -28,7 +28,8 @@
       },
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_CXX_INCLUDE_WHAT_YOU_USE": "include-what-you-use"
+        "CMAKE_CXX_INCLUDE_WHAT_YOU_USE": "include-what-you-use",
+        "BUILD_TESTING": "On"
       }
     }
   ]

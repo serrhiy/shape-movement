@@ -17,7 +17,7 @@ namespace logger {
     openlog(name.data(), LOG_CONS | LOG_PERROR | LOG_PID, LOG_USER);
   }
 
-  void log(int level, std::string_view format, const src_loc& location, auto&&... args) {
+  void log(int level, const src_loc& location, std::string_view format, auto&&... args) {
     const std::string message =
       fmt::format(fmt::runtime(format), std::forward<decltype(args)>(args)...);
     const std::filesystem::path full_path = location.file_name();
@@ -26,31 +26,25 @@ namespace logger {
 
   auto logInfo(std::string_view format, const src_loc& location = src_loc::current()) {
     return [format, location](auto&&... args) {
-      log(LOG_INFO, format, location, std::forward<decltype(args)>(args)...);
+      log(LOG_INFO, location, format, std::forward<decltype(args)>(args)...);
     };
   }
 
   auto logWarning(std::string_view format, const src_loc& location = src_loc::current()) {
     return [format, location](auto&&... args) {
-      log(LOG_WARNING, format, location, std::forward<decltype(args)>(args)...);
+      log(LOG_WARNING, location, format, std::forward<decltype(args)>(args)...);
     };
   }
 
   auto logError(std::string_view format, const src_loc& location = src_loc::current()) {
     return [format, location](auto&&... args) {
-      log(LOG_ERR, format, location, std::forward<decltype(args)>(args)...);
+      log(LOG_ERR, location, format, std::forward<decltype(args)>(args)...);
     };
   }
 
   auto logDebug(std::string_view format, const src_loc& location = src_loc::current()) {
     return [format, location](auto&&... args) {
-      log(LOG_DEBUG, format, location, std::forward<decltype(args)>(args)...);
-    };
-  }
-
-  auto logTest(std::string_view format, const src_loc& location = src_loc::current()) {
-    return [format, location](auto&&... args) {
-      log(LOG_DEBUG, format, location, std::forward<decltype(args)>(args)...);
+      log(LOG_DEBUG, location, format, std::forward<decltype(args)>(args)...);
     };
   }
 }

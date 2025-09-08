@@ -1,13 +1,14 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include <functional>
 #include <array>
 #include <filesystem>
+#include <exception>
+#include <stdexcept>
+#include <iostream>
 
 #include <logger/core.hh>
 #include <utils/defer.hh>
-#include <utils/functional.hh>
 #include <version.hh>
 #include <resources.hh>
 
@@ -43,25 +44,20 @@ void onKeyPress(GLFWwindow* window, int key, int scancode, int action, int mods)
   }
 }
 
-int main(const int argc, const char* argv[]) {
-  logger::open(title);
-  logger::logDebug("Start. Version {}.{}")(VERSION_MAJOR, VERSION_MINOR);
-
+void start() {
   if (!glfwInit()) {
-    logger::logError("Cannot initiate glfw")();
-    return -1;
+    throw std::runtime_error{ "Cannot initiate glfw" };
   }
 
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-  utils::defer defer{ utils::sequence(glfwTerminate, logger::logDebug("Exit")) };
+  utils::defer defer{ glfwTerminate };
 
   GLFWwindow* window = glfwCreateWindow(width, height, title, nullptr, nullptr);
   if (!window) {
-    logger::logError("Imposible to create window")();
-    return -1;
+    throw std::runtime_error{ "Imposible to create window" };
   }
 
   glfwSetFramebufferSizeCallback(window, onWindowSizeChanged);
@@ -69,8 +65,7 @@ int main(const int argc, const char* argv[]) {
 
   glfwMakeContextCurrent(window);
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-    logger::logError("Impossible to load OpenGL functions")();
-    return -1;
+    std::runtime_error{ "Impossible to load OpenGL functions" };
   }
 
   unsigned vertex_array_object = 0;
@@ -107,6 +102,24 @@ int main(const int argc, const char* argv[]) {
     glfwSwapBuffers(window);
     glfwPollEvents();
   }
+}
 
-  return 0;
+int main(const int argc, const char* argv[]) {
+  try {
+    logger::open(title);
+    logger::logDebug("Start. Version {}.{}")(VERSION_MAJOR, VERSION_MINOR);
+    utils::defer defer{ logger::logDebug("Exit") };
+
+    try {
+      start();
+      return 0;
+    }
+    catch(const std::exception& exception) {
+      logger::logError(exception.what())();
+    }
+  }
+  catch(const std::exception& exception) {
+    std::cerr << exception.what() << '\n';
+  }
+  return 1;
 }

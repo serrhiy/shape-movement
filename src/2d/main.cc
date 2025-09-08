@@ -22,14 +22,14 @@ constexpr const char* title = "Shape movement 2D";
 constexpr const char* vertex_shader_path = SHADERS_PATH "/vertex.vert";
 constexpr const char* fragment_shader_path = SHADERS_PATH "/fragment.frag";
 
-constexpr std::array<float, 18> vertices{
-   0.5f,  0.5f, 0.0f,
-   0.5f, -0.5f, 0.0f,
-  -0.5f,  0.5f, 0.0f,
+constexpr std::array<float, 12> vertices{
+   0.5f,  0.5f,
+   0.5f, -0.5f,
+  -0.5f,  0.5f,
 
-   0.5f, -0.5f, 0.0f,
-  -0.5f, -0.5f, 0.0f,
-  -0.5f,  0.5f, 0.0f
+   0.5f, -0.5f,
+  -0.5f, -0.5f,
+  -0.5f,  0.5f,
 };
 
 void onWindowSizeChanged(GLFWwindow* window, int width, int height) {
@@ -77,7 +77,7 @@ void start() {
   glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_object);
   glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
 
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
+  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), nullptr);
   glEnableVertexAttribArray(0);
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);

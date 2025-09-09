@@ -6,30 +6,31 @@
 #include <exception>
 #include <stdexcept>
 #include <iostream>
+#include <cmath>
 
 #include <logger/core.hh>
 #include <utils/defer.hh>
+#include <math/Matrix3x3.hh>
 #include <version.hh>
 #include <resources.hh>
 
 #include "Shader.hh"
 #include "ShaderProgram.hh"
 
-constexpr unsigned height = 600;
+constexpr unsigned height = 800;
 constexpr unsigned width = 800;
 constexpr const char* title = "Shape movement 2D";
 
 constexpr const char* vertex_shader_path = SHADERS_PATH "/vertex.vert";
 constexpr const char* fragment_shader_path = SHADERS_PATH "/fragment.frag";
 
-constexpr std::array<float, 12> vertices{
-   0.5f,  0.5f,
-   0.5f, -0.5f,
-  -0.5f,  0.5f,
+constexpr float square_size = 0.25;
+constexpr float circle_radius = 0.95f;
 
-   0.5f, -0.5f,
-  -0.5f, -0.5f,
-  -0.5f,  0.5f,
+constexpr std::array<float, 12> vertices{
+  square_size, square_size,  square_size,  -square_size, -square_size, square_size,
+
+  square_size, -square_size, -square_size, -square_size, -square_size, square_size,
 };
 
 void onWindowSizeChanged(GLFWwindow* window, int width, int height) {
@@ -65,7 +66,7 @@ void start() {
 
   glfwMakeContextCurrent(window);
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-    std::runtime_error{ "Impossible to load OpenGL functions" };
+    throw std::runtime_error{ "Impossible to load OpenGL functions" };
   }
 
   unsigned vertex_array_object = 0;
@@ -97,6 +98,20 @@ void start() {
 
     shader_program.use();
     glBindVertexArray(vertex_array_object);
+
+    const float x = static_cast<float>(glfwGetTime());
+    const float sinx = std::sin(x);
+    const float cosx = std::cos(x);
+
+    const float scale_factor = std::fabs(sinx) + 0.25;
+
+    const float shift_x = cosx * (circle_radius - square_size * scale_factor);
+    const float shift_y = sinx * (circle_radius - square_size * scale_factor);
+
+    const math::Matrix3x3 translate = math::Matrix3x3::translate(shift_x, shift_y);
+    const math::Matrix3x3 scale = math::Matrix3x3::scale(scale_factor);
+    shader_program.setUniform("transform", translate * scale);
+
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
     glfwSwapBuffers(window);
@@ -113,12 +128,10 @@ int main(const int argc, const char* argv[]) {
     try {
       start();
       return 0;
-    }
-    catch(const std::exception& exception) {
+    } catch (const std::exception& exception) {
       logger::logError(exception.what())();
     }
-  }
-  catch(const std::exception& exception) {
+  } catch (const std::exception& exception) {
     std::cerr << exception.what() << '\n';
   }
   return 1;

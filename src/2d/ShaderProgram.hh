@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Shader.hh"
+#include <math/Matrix3x3.hh>
+#include <string_view>
 
 class ShaderProgram {
   unsigned shader_program;
@@ -25,4 +27,6 @@ public:
 
   void attach();
   void use();
+
+  void setUniform(std::string_view location, const math::Matrix3x3& matrix);
 };

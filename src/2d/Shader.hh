@@ -3,7 +3,7 @@
 #include <glad/glad.h>
 
 #include <utils/fs.hh>
-#include <iostream>
+#include <math/Matrix3x3.hh>
 
 template <unsigned shader_type>
 class Shader {

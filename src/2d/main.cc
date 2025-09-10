@@ -1,7 +1,6 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include <array>
 #include <filesystem>
 #include <exception>
 #include <stdexcept>
@@ -10,9 +9,9 @@
 
 #include <logger/core.hh>
 #include <utils/defer.hh>
-#include <math/Matrix3x3.hh>
 #include <version.hh>
 #include <resources.hh>
+#include <math/Matrix.hh>
 
 #include "Shader.hh"
 #include "ShaderProgram.hh"
@@ -27,10 +26,14 @@ constexpr const char* fragment_shader_path = SHADERS_PATH "/fragment.frag";
 constexpr float square_size = 0.25;
 constexpr float circle_radius = 0.95f;
 
-constexpr std::array<float, 12> vertices{
-  square_size, square_size,  square_size,  -square_size, -square_size, square_size,
+const math::Matrix vertices{
+  {  square_size,  square_size, 1 },
+  {  square_size, -square_size, 1 },
+  { -square_size,  square_size, 1 },
 
-  square_size, -square_size, -square_size, -square_size, -square_size, square_size,
+  {  square_size, -square_size, 1 },
+  { -square_size, -square_size, 1 },
+  { -square_size,  square_size, 1 },
 };
 
 void onWindowSizeChanged(GLFWwindow* window, int width, int height) {
@@ -69,21 +72,6 @@ void start() {
     throw std::runtime_error{ "Impossible to load OpenGL functions" };
   }
 
-  unsigned vertex_array_object = 0;
-  glGenVertexArrays(1, &vertex_array_object);
-  glBindVertexArray(vertex_array_object);
-
-  unsigned vertex_buffer_object = 0;
-  glGenBuffers(1, &vertex_buffer_object);
-  glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_object);
-  glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
-
-  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), nullptr);
-  glEnableVertexAttribArray(0);
-
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  glBindVertexArray(0);
-
   VertexShader vertex_shader{ vertex_shader_path };
   FragmentShader fragment_shader{ fragment_shader_path };
   vertex_shader.compile();
@@ -92,12 +80,26 @@ void start() {
   ShaderProgram shader_program{ vertex_shader, fragment_shader };
   shader_program.attach();
 
+  unsigned vertex_array_object;
+  glGenVertexArrays(1, &vertex_array_object);
+  glBindVertexArray(vertex_array_object);
+  utils::defer defer_vao{ glDeleteVertexArrays, 1, &vertex_array_object };
+
+  unsigned vertex_buffer_object;
+  glGenBuffers(1, &vertex_buffer_object);
+  glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_object);
+  const unsigned items_number = vertices.getRows() * vertices.getCols();
+  glBufferData(GL_ARRAY_BUFFER, items_number * sizeof(float), nullptr, GL_DYNAMIC_DRAW);
+  utils::defer defer_vbo{ glDeleteBuffers, 1, &vertex_buffer_object };
+
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
+  glEnableVertexAttribArray(0);
+
+  glBindVertexArray(0);
+
   while (!glfwWindowShouldClose(window)) {
     glClearColor(0.145f, 0.09f, 0.4f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
-
-    shader_program.use();
-    glBindVertexArray(vertex_array_object);
 
     const float x = static_cast<float>(glfwGetTime());
     const float sinx = std::sin(x);
@@ -108,9 +110,13 @@ void start() {
     const float shift_x = cosx * (circle_radius - square_size * scale_factor);
     const float shift_y = sinx * (circle_radius - square_size * scale_factor);
 
-    const math::Matrix3x3 translate = math::Matrix3x3::translate(shift_x, shift_y);
-    const math::Matrix3x3 scale = math::Matrix3x3::scale(scale_factor);
-    shader_program.setUniform("transform", translate * scale);
+    const math::Matrix translate = math::Matrix::translate3x3(shift_x, shift_y);
+    const math::Matrix scale = math::Matrix::scale3x3(scale_factor);
+    const math::Matrix position = vertices * scale * translate;
+
+    shader_program.use();
+    glBindVertexArray(vertex_array_object);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, items_number * sizeof(float), position.pointer());
 
     glDrawArrays(GL_TRIANGLES, 0, 6);
 

@@ -4,7 +4,7 @@
 #include <utility>
 #include <glad/glad.h>
 #include <stdexcept>
-#include <math/Matrix3x3.hh>
+#include <math/Matrix.hh>
 
 void ShaderProgram::deleteProgram() {
   if (shader_program != 0) {
@@ -65,7 +65,7 @@ void ShaderProgram::use() {
   if (shader_program != 0) glUseProgram(shader_program);
 }
 
-void ShaderProgram::setUniform(std::string_view location, const math::Matrix3x3& matrix) {
+void ShaderProgram::setUniform(std::string_view location, const math::Matrix& matrix) {
   const unsigned location_id = glGetUniformLocation(shader_program, location.data());
 
   if (unsigned error = glGetError(); error != GL_NO_ERROR) {

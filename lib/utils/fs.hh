@@ -1,6 +1,8 @@
 #pragma once
 
-#include <string>
 #include <filesystem>
+#include <string>
 
-namespace utils { std::string readFile(const std::filesystem::path& path); };
+namespace utils {
+std::string readFile(const std::filesystem::path& path);
+};

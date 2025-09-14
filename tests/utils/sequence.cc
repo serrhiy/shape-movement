@@ -1,6 +1,6 @@
 #include <assert.h>
-#include <functional>
 
+#include <functional>
 #include <utils/functional.hh>
 
 int main(const int argc, const char* argv[]) {
@@ -13,7 +13,8 @@ int main(const int argc, const char* argv[]) {
   assert(number == 1 && "utils::sequence does not work with 1 function");
 
   utils::sequence(inc, inc, inc)();
-  assert(number == 4 && "utils::sequence does not work with multiple functions");
+  assert(number == 4 &&
+         "utils::sequence does not work with multiple functions");
 
   return 0;
 }

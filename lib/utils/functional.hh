@@ -3,7 +3,7 @@
 #include <functional>
 
 namespace utils {
-  std::function<void()> sequence(auto... functions) {
-    return [=]() { (functions(), ...); };
-  }
+std::function<void()> sequence(auto... functions) {
+  return [=]() { (functions(), ...); };
 }
+}  // namespace utils

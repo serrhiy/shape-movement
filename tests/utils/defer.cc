@@ -1,6 +1,6 @@
 #include <assert.h>
-#include <functional>
 
+#include <functional>
 #include <utils/defer.hh>
 
 int main(const int argc, const char* argv[]) {
@@ -9,15 +9,16 @@ int main(const int argc, const char* argv[]) {
   const auto inc2 = [](int& number) { number++; };
 
   {
-    utils::defer d1{ inc1 };
+    utils::defer d1{inc1};
   }
   assert(number == 1 && "Function is not called in the destructor");
 
   {
-    utils::defer d1{ inc2, std::ref(number) };
+    utils::defer d1{inc2, std::ref(number)};
   }
 
-  assert(number == 2 && "Function with parameter is not called in the destructor");
+  assert(number == 2 &&
+         "Function with parameter is not called in the destructor");
 
   return 0;
 }

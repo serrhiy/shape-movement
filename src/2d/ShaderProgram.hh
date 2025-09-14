@@ -1,8 +1,9 @@
 #pragma once
 
-#include "Shader.hh"
 #include <math/Matrix.hh>
 #include <string_view>
+
+#include "Shader.hh"
 
 class ShaderProgram {
   unsigned shader_program;
@@ -13,7 +14,7 @@ class ShaderProgram {
 
   void deleteProgram();
 
-public:
+ public:
   ShaderProgram() = delete;
   ShaderProgram(const VertexShader& vertex, const FragmentShader& fragment);
 

@@ -1,17 +1,18 @@
+// clang-format off
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+// clang-format on
 
-#include <filesystem>
-#include <exception>
-#include <stdexcept>
-#include <iostream>
 #include <cmath>
-
+#include <exception>
+#include <filesystem>
+#include <iostream>
 #include <logger/core.hh>
+#include <math/Matrix.hh>
+#include <resources.hh>
+#include <stdexcept>
 #include <utils/defer.hh>
 #include <version.hh>
-#include <resources.hh>
-#include <math/Matrix.hh>
 
 #include "Shader.hh"
 #include "ShaderProgram.hh"
@@ -27,13 +28,11 @@ constexpr float square_size = 0.25;
 constexpr float circle_radius = 0.95f;
 
 const math::Matrix vertices{
-  {  square_size,  square_size, 1 },
-  {  square_size, -square_size, 1 },
-  { -square_size,  square_size, 1 },
+    {square_size, square_size, 1},  {square_size, -square_size, 1},
+    {-square_size, square_size, 1},
 
-  {  square_size, -square_size, 1 },
-  { -square_size, -square_size, 1 },
-  { -square_size,  square_size, 1 },
+    {square_size, -square_size, 1}, {-square_size, -square_size, 1},
+    {-square_size, square_size, 1},
 };
 
 void onWindowSizeChanged(GLFWwindow* window, int width, int height) {
@@ -41,7 +40,8 @@ void onWindowSizeChanged(GLFWwindow* window, int width, int height) {
   glViewport(0, 0, width, height);
 }
 
-void onKeyPress(GLFWwindow* window, int key, int scancode, int action, int mods) {
+void onKeyPress(GLFWwindow* window, int key, int scancode, int action,
+                int mods) {
   logger::logDebug("Key action. Key: {}, action: {}")(key, action);
   if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
     glfwSetWindowShouldClose(window, true);
@@ -50,18 +50,18 @@ void onKeyPress(GLFWwindow* window, int key, int scancode, int action, int mods)
 
 void start() {
   if (!glfwInit()) {
-    throw std::runtime_error{ "Cannot initiate glfw" };
+    throw std::runtime_error{"Cannot initiate glfw"};
   }
 
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-  utils::defer defer{ glfwTerminate };
+  utils::defer defer{glfwTerminate};
 
   GLFWwindow* window = glfwCreateWindow(width, height, title, nullptr, nullptr);
   if (!window) {
-    throw std::runtime_error{ "Imposible to create window" };
+    throw std::runtime_error{"Imposible to create window"};
   }
 
   glfwSetFramebufferSizeCallback(window, onWindowSizeChanged);
@@ -69,28 +69,29 @@ void start() {
 
   glfwMakeContextCurrent(window);
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-    throw std::runtime_error{ "Impossible to load OpenGL functions" };
+    throw std::runtime_error{"Impossible to load OpenGL functions"};
   }
 
-  VertexShader vertex_shader{ vertex_shader_path };
-  FragmentShader fragment_shader{ fragment_shader_path };
+  VertexShader vertex_shader{vertex_shader_path};
+  FragmentShader fragment_shader{fragment_shader_path};
   vertex_shader.compile();
   fragment_shader.compile();
 
-  ShaderProgram shader_program{ vertex_shader, fragment_shader };
+  ShaderProgram shader_program{vertex_shader, fragment_shader};
   shader_program.attach();
 
   unsigned vertex_array_object;
   glGenVertexArrays(1, &vertex_array_object);
   glBindVertexArray(vertex_array_object);
-  utils::defer defer_vao{ glDeleteVertexArrays, 1, &vertex_array_object };
+  utils::defer defer_vao{glDeleteVertexArrays, 1, &vertex_array_object};
 
   unsigned vertex_buffer_object;
   glGenBuffers(1, &vertex_buffer_object);
   glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_object);
   const unsigned items_number = vertices.getRows() * vertices.getCols();
-  glBufferData(GL_ARRAY_BUFFER, items_number * sizeof(float), nullptr, GL_DYNAMIC_DRAW);
-  utils::defer defer_vbo{ glDeleteBuffers, 1, &vertex_buffer_object };
+  glBufferData(GL_ARRAY_BUFFER, items_number * sizeof(float), nullptr,
+               GL_DYNAMIC_DRAW);
+  utils::defer defer_vbo{glDeleteBuffers, 1, &vertex_buffer_object};
 
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
   glEnableVertexAttribArray(0);
@@ -116,7 +117,8 @@ void start() {
 
     shader_program.use();
     glBindVertexArray(vertex_array_object);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, items_number * sizeof(float), position.pointer());
+    glBufferSubData(GL_ARRAY_BUFFER, 0, items_number * sizeof(float),
+                    position.pointer());
 
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
@@ -129,7 +131,7 @@ int main(const int argc, const char* argv[]) {
   try {
     logger::open(title);
     logger::logDebug("Start. Version {}.{}")(VERSION_MAJOR, VERSION_MINOR);
-    utils::defer defer{ logger::logDebug("Exit") };
+    utils::defer defer{logger::logDebug("Exit")};
 
     try {
       start();

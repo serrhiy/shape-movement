@@ -2,10 +2,11 @@
 
 #include <glad/glad.h>
 
-#include <math/Matrix.hh>
 #include <stdexcept>
 #include <string>
 #include <utility>
+
+#include "Shader.hh"
 
 void ShaderProgram::deleteProgram() {
   if (shader_program != 0) {
@@ -69,8 +70,8 @@ void ShaderProgram::use() {
   if (shader_program != 0) glUseProgram(shader_program);
 }
 
-void ShaderProgram::setUniform(std::string_view location,
-                               const math::Matrix& matrix) {
+void ShaderProgram::setUniformMatrix3x3(std::string_view location,
+                                        const float* data) {
   const unsigned location_id =
       glGetUniformLocation(shader_program, location.data());
 
@@ -88,5 +89,5 @@ void ShaderProgram::setUniform(std::string_view location,
     }
   }
 
-  glUniformMatrix3fv(location_id, 1, GL_TRUE, matrix.pointer());
+  glUniformMatrix3fv(location_id, 1, GL_TRUE, data);
 }

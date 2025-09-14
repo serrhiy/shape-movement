@@ -1,6 +1,5 @@
 #pragma once
 
-#include <math/Matrix.hh>
 #include <string_view>
 
 #include "Shader.hh"
@@ -29,5 +28,5 @@ class ShaderProgram {
   void attach();
   void use();
 
-  void setUniform(std::string_view location, const math::Matrix& matrix);
+  void setUniformMatrix3x3(std::string_view location, const float* data);
 };

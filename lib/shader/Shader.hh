@@ -2,6 +2,7 @@
 
 #include <glad/glad.h>
 
+#include <format>
 #include <utils/fs.hh>
 
 template <unsigned shader_type>
@@ -62,8 +63,9 @@ class Shader {
     if (!error_flag) {
       glGetShaderInfoLog(object, error_buffer_size, nullptr,
                          error_messsage_buffer.data());
-      throw std::runtime_error{"Error while compiling " + path.string() +
-                               ":\n" + error_messsage_buffer};
+      throw std::runtime_error{std::format("Error while compiling {}:\n{}",
+                                           path.string(),
+                                           error_messsage_buffer)};
     }
   }
 

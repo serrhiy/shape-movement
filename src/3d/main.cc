@@ -27,11 +27,11 @@ constexpr float square_size = 0.25;
 constexpr float circle_radius = 0.95f;
 
 const math::Matrix vertices{
-    {square_size, square_size, 1},  {square_size, -square_size, 1},
-    {-square_size, square_size, 1},
+    {square_size, square_size, 0, 1},  {square_size, -square_size, 0, 1},
+    {-square_size, square_size, 0, 1},
 
-    {square_size, -square_size, 1}, {-square_size, -square_size, 1},
-    {-square_size, square_size, 1},
+    {square_size, -square_size, 0, 1}, {-square_size, -square_size, 0, 1},
+    {-square_size, square_size, 0, 1},
 };
 
 void onWindowSizeChanged(GLFWwindow* window, int width, int height) {
@@ -92,7 +92,8 @@ void start() {
                GL_DYNAMIC_DRAW);
   utils::defer defer_vbo{glDeleteBuffers, 1, &vertex_buffer_object};
 
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
+  glVertexAttribPointer(0, vertices.getCols(), GL_FLOAT, GL_FALSE,
+                        vertices.getCols() * sizeof(float), nullptr);
   glEnableVertexAttribArray(0);
 
   glBindVertexArray(0);
@@ -110,9 +111,12 @@ void start() {
     const float shift_x = cosx * (circle_radius - square_size * scale_factor);
     const float shift_y = sinx * (circle_radius - square_size * scale_factor);
 
-    const math::Matrix translate = math::Matrix::translate3x3(shift_x, shift_y);
-    const math::Matrix scale = math::Matrix::scale3x3(scale_factor);
-    const math::Matrix position = vertices * scale * translate;
+    const math::Matrix translate =
+        math::Matrix::translate4x4(shift_x, shift_y, 0);
+    const math::Matrix scale = math::Matrix::scale4x4(scale_factor);
+    const math::Matrix rotate = math::Matrix::rotate4x4z(x);
+
+    const math::Matrix position = vertices * rotate * scale * translate;
 
     shader_program.use();
     glBindVertexArray(vertex_array_object);

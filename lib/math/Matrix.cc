@@ -54,9 +54,7 @@ Matrix Matrix::scale4x4(const float x, const float y, const float z) {
   }};
 }
 
-Matrix Matrix::scale4x4(const float n) {
-  return scale4x4(n, n, n);
-}
+Matrix Matrix::scale4x4(const float n) { return scale4x4(n, n, n); }
 
 Matrix Matrix::translate4x4(const float x, const float y, const float z) {
   return Matrix{{

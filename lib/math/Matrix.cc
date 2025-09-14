@@ -1,6 +1,7 @@
 #include "Matrix.hh"
 
 #include <algorithm>
+#include <cmath>
 #include <initializer_list>
 #include <stdexcept>
 #include <utility>
@@ -53,6 +54,10 @@ Matrix Matrix::scale4x4(const float x, const float y, const float z) {
   }};
 }
 
+Matrix Matrix::scale4x4(const float n) {
+  return scale4x4(n, n, n);
+}
+
 Matrix Matrix::translate4x4(const float x, const float y, const float z) {
   return Matrix{{
       {1, 0, 0, 0},
@@ -60,6 +65,27 @@ Matrix Matrix::translate4x4(const float x, const float y, const float z) {
       {0, 0, 1, 0},
       {x, y, z, 1},
   }};
+}
+
+Matrix Matrix::rotate4x4x(const float theta) {
+  return Matrix{{{1, 0, 0, 0},
+                 {0, std::cos(theta), std::sin(theta), 0},
+                 {0, -std::sin(theta), std::cos(theta), 0},
+                 {0, 0, 0, 1}}};
+}
+
+Matrix Matrix::rotate4x4y(const float theta) {
+  return Matrix{{{std::cos(theta), 0, -std::sin(theta), 0},
+                 {0, 1, 0, 0},
+                 {std::sin(theta), 0, std::cos(theta), 0},
+                 {0, 0, 0, 1}}};
+}
+
+Matrix Matrix::rotate4x4z(const float theta) {
+  return Matrix{{{std::cos(theta), std::sin(theta), 0, 0},
+                 {-std::sin(theta), std::cos(theta), 0, 0},
+                 {0, 0, 1, 0},
+                 {0, 0, 0, 1}}};
 }
 
 Matrix Matrix::operator*(const Matrix& other) const {

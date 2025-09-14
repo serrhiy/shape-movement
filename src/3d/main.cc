@@ -27,12 +27,24 @@ constexpr const char* fragment_shader_path = SHADERS_PATH "/fragment.frag";
 constexpr float square_size = 0.25;
 constexpr float circle_radius = 0.95f;
 
-const math::Matrix vertices{
-    {square_size, square_size, 0, 1},  {square_size, -square_size, 0, 1},
-    {-square_size, square_size, 0, 1},
+constexpr float base_size = 0.5f;
 
-    {square_size, -square_size, 0, 1}, {-square_size, -square_size, 0, 1},
-    {-square_size, square_size, 0, 1},
+const math::Matrix vertices{
+  { -base_size, -base_size, -base_size, 1 },
+  { base_size, -base_size, -base_size, 1 },
+  { 0, -base_size, base_size, 1 },
+
+  { -base_size, -base_size, -base_size, 1 },
+  { 0, -base_size, base_size, 1 },
+  { 0, base_size * 1.5, 0, 1 },
+
+  { 0, -base_size, base_size, 1 },
+  { base_size, -base_size, -base_size, 1 },
+  { 0, base_size * 1.5, 0, 1 },
+
+  { -base_size, -base_size, -base_size, 1 },
+  { base_size, -base_size, -base_size, 1 },
+  { 0, base_size * 1.5, 0, 1 },
 };
 
 void onWindowSizeChanged(GLFWwindow* window, int width, int height) {
@@ -99,23 +111,21 @@ void start() {
 
   glBindVertexArray(0);
 
+  glEnable(GL_DEPTH_TEST);
+  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   while (!glfwWindowShouldClose(window)) {
     glClearColor(0.145f, 0.09f, 0.4f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     const float x = static_cast<float>(glfwGetTime());
-    const float sinx = std::sin(x);
-    const float cosx = std::cos(x);
 
-    const float scale_factor = std::fabs(sinx) + 0.25;
+    constexpr float max = 100.f, min = 0.1f;
 
-    const float shift_x = cosx * (circle_radius - square_size * scale_factor);
-    const float shift_y = sinx * (circle_radius - square_size * scale_factor);
 
-    const math::Matrix rotate = math::Matrix::rotate4x4x(-std::numbers::pi / 4);
-    const math::Matrix translate = math::Matrix::translate4x4(0, 0, -3);
+    const math::Matrix rotate = math::Matrix::rotate4x4y(x);
+    const math::Matrix translate = math::Matrix::translate4x4(0, 0, -5);
     const math::Matrix projection = math::Matrix::perspective(
-        std::numbers::pi / 4, static_cast<double>(width) / height, 0.1f, 100.f);
+        std::numbers::pi / 4, static_cast<double>(width) / height, min, max);
 
     const math::Matrix position = vertices * (rotate * translate * projection);
 
@@ -124,7 +134,7 @@ void start() {
     glBufferSubData(GL_ARRAY_BUFFER, 0, items_number * sizeof(float),
                     position.pointer());
 
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glDrawArrays(GL_TRIANGLES, 0, vertices.getRows());
 
     glfwSwapBuffers(window);
     glfwPollEvents();

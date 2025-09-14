@@ -86,6 +86,15 @@ Matrix Matrix::rotate4x4z(const float theta) {
                  {0, 0, 0, 1}}};
 }
 
+Matrix Matrix::perspective(float fov, float aspect, float near, float far) {
+  const float top = near * std::tan(fov / 2.0f);
+  const float right = top * aspect;
+  return Matrix{{{near / right, 0, 0, 0},
+                 {0, near / top, 0, 0},
+                 {0, 0, -(far + near) / (far - near), -1},
+                 {0, 0, -(2 * far * near) / (far - near), 0}}};
+}
+
 Matrix Matrix::operator*(const Matrix& other) const {
   if (getCols() != other.getRows()) {
     throw std::runtime_error{"Invalid matrix size for multiplication"};

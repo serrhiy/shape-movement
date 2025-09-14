@@ -9,6 +9,7 @@
 #include <iostream>
 #include <logger/core.hh>
 #include <math/Matrix.hh>
+#include <numbers>
 #include <resources.hh>
 #include <shader/Shader.hh>
 #include <shader/ShaderProgram.hh>
@@ -111,12 +112,12 @@ void start() {
     const float shift_x = cosx * (circle_radius - square_size * scale_factor);
     const float shift_y = sinx * (circle_radius - square_size * scale_factor);
 
-    const math::Matrix translate =
-        math::Matrix::translate4x4(shift_x, shift_y, 0);
-    const math::Matrix scale = math::Matrix::scale4x4(scale_factor);
-    const math::Matrix rotate = math::Matrix::rotate4x4z(x);
+    const math::Matrix rotate = math::Matrix::rotate4x4x(-std::numbers::pi / 4);
+    const math::Matrix translate = math::Matrix::translate4x4(0, 0, -3);
+    const math::Matrix projection = math::Matrix::perspective(
+        std::numbers::pi / 4, static_cast<double>(width) / height, 0.1f, 100.f);
 
-    const math::Matrix position = vertices * rotate * scale * translate;
+    const math::Matrix position = vertices * (rotate * translate * projection);
 
     shader_program.use();
     glBindVertexArray(vertex_array_object);

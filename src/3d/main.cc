@@ -9,6 +9,7 @@
 #include <iostream>
 #include <logger/core.hh>
 #include <math/Matrix.hh>
+#include <math/Vector.hh>
 #include <numbers>
 #include <resources.hh>
 #include <shader/Shader.hh>
@@ -17,34 +18,39 @@
 #include <utils/defer.hh>
 #include <version.hh>
 
+using std::numbers::pi;
+
 constexpr unsigned height = 800;
 constexpr unsigned width = 800;
-constexpr const char* title = "Shape movement 2D";
+constexpr const char* title = "Shape movement 3D";
 
 constexpr const char* vertex_shader_path = SHADERS_PATH "/vertex.vert";
 constexpr const char* fragment_shader_path = SHADERS_PATH "/fragment.frag";
 
-constexpr float square_size = 0.25;
-constexpr float circle_radius = 0.95f;
+constexpr float start_angle = pi / 2;
+constexpr float low = -1;
+constexpr float high = 1;
 
-constexpr float base_size = 0.5f;
+const math::Vector3 base1{std::cosf(start_angle), low, std::sinf(start_angle)};
+const math::Vector3 base2{std::cosf(start_angle + 2.f * pi / 3), low,
+                          std::sinf(start_angle + 2 * pi / 3)};
+const math::Vector3 base3{std::cosf(start_angle - 2 * pi / 3), low,
+                          std::sinf(start_angle - 2 * pi / 3)};
+const math::Vector3 top{(base1.x + base2.x + base3.x) / 3.f, high,
+                        (base1.z + base2.z + base3.z) / 3.f};
 
 const math::Matrix vertices{
-  { -base_size, -base_size, -base_size, 1 },
-  { base_size, -base_size, -base_size, 1 },
-  { 0, -base_size, base_size, 1 },
+    {base1.x, base1.y, base1.z, 1}, {base2.x, base2.y, base2.z, 1},
+    {base3.x, base3.y, base3.z, 1},
 
-  { -base_size, -base_size, -base_size, 1 },
-  { 0, -base_size, base_size, 1 },
-  { 0, base_size * 1.5, 0, 1 },
+    {base1.x, base1.y, base1.z, 1}, {base3.x, base3.y, base3.z, 1},
+    {top.x, top.y, top.z, 1},
 
-  { 0, -base_size, base_size, 1 },
-  { base_size, -base_size, -base_size, 1 },
-  { 0, base_size * 1.5, 0, 1 },
+    {base3.x, base3.y, base3.z, 1}, {base2.x, base2.y, base2.z, 1},
+    {top.x, top.y, top.z, 1},
 
-  { -base_size, -base_size, -base_size, 1 },
-  { base_size, -base_size, -base_size, 1 },
-  { 0, base_size * 1.5, 0, 1 },
+    {base2.x, base2.y, base2.z, 1}, {base1.x, base1.y, base1.z, 1},
+    {top.x, top.y, top.z, 1},
 };
 
 void onWindowSizeChanged(GLFWwindow* window, int width, int height) {
@@ -119,20 +125,26 @@ void start() {
 
     const float x = static_cast<float>(glfwGetTime());
 
-    constexpr float max = 100.f, min = 0.1f;
+    constexpr float max = 20.f, min = 0.1f;
 
-
-    const math::Matrix rotate = math::Matrix::rotate4x4y(x);
-    const math::Matrix translate = math::Matrix::translate4x4(0, 0, -5);
+    const math::Matrix rotate = math::Matrix::rotate4x4(0, 1, 0, x);
+    const math::Matrix translate = math::Matrix::translate4x4(
+        2 * cos(x / 2 - pi), 0,
+        -(max / 2) * sin(x / 2 - pi) - (max / 2) - 3.5);
     const math::Matrix projection = math::Matrix::perspective(
         std::numbers::pi / 4, static_cast<double>(width) / height, min, max);
 
-    const math::Matrix position = vertices * (rotate * translate * projection);
+    const math::Matrix position = vertices * rotate * translate * projection;
 
     shader_program.use();
     glBindVertexArray(vertex_array_object);
     glBufferSubData(GL_ARRAY_BUFFER, 0, items_number * sizeof(float),
                     position.pointer());
+
+    float r = std::fabs(std::sin(x));
+    float g = std::fabs(std::sin(x + 2.0f * pi / 3.0f));
+    float b = std::fabs(std::sin(x + 4.0f * pi / 3.0f));
+    shader_program.setUniformVector3("color", r, g, b);
 
     glDrawArrays(GL_TRIANGLES, 0, vertices.getRows());
 

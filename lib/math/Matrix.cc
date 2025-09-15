@@ -86,6 +86,29 @@ Matrix Matrix::rotate4x4z(const float theta) {
                  {0, 0, 0, 1}}};
 }
 
+Matrix Matrix::rotate4x4(float x, float y, float z, float theta) {
+  const float sina = std::sin(theta);
+  const float cosa = std::cos(theta);
+  std::vector<float> matrix(16);
+  matrix[0] = cosa + x * x * (1 - cosa);
+  matrix[1] = y * x * (1 - cosa) + z * sina;
+  matrix[2] = z * x * (1 - cosa) - y * sina;
+  matrix[3] = 0.0f;
+  matrix[4] = x * y * (1 - cosa) - z * sina;
+  matrix[5] = cosa + y * y * (1 - cosa);
+  matrix[6] = z * y * (1 - cosa) + x * sina;
+  matrix[7] = 0.0f;
+  matrix[8] = x * z * (1 - cosa) + y * sina;
+  matrix[9] = y * z * (1 - cosa) - x * sina;
+  matrix[10] = cosa + z * z * (1 - cosa);
+  matrix[11] = 0.0f;
+  matrix[12] = 0.0f;
+  matrix[13] = 0.0f;
+  matrix[14] = 0.0f;
+  matrix[15] = 1.0f;
+  return Matrix{matrix, 4, 4};
+}
+
 Matrix Matrix::perspective(float fov, float aspect, float near, float far) {
   const float top = near * std::tan(fov / 2.0f);
   const float right = top * aspect;

@@ -26,6 +26,7 @@ class Matrix {
   static Matrix rotate4x4x(const float theta);
   static Matrix rotate4x4y(const float theta);
   static Matrix rotate4x4z(const float theta);
+  static Matrix rotate4x4(float x, float y, float z, float theta);
   static Matrix perspective(float fov, float aspect, float near, float far);
 
   Matrix operator*(const Matrix& other) const;

@@ -13,6 +13,8 @@ class ShaderProgram {
 
   void deleteProgram();
 
+  unsigned getLocation(std::string_view location);
+
  public:
   ShaderProgram() = delete;
   ShaderProgram(const VertexShader& vertex, const FragmentShader& fragment);
@@ -29,4 +31,5 @@ class ShaderProgram {
   void use();
 
   void setUniformMatrix3x3(std::string_view location, const float* data);
+  void setUniformVector3(std::string_view location, float x, float y, float z);
 };

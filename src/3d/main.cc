@@ -18,7 +18,7 @@
 #include <utils/defer.hh>
 #include <version.hh>
 
-using std::numbers::pi;
+constexpr float fpi = std::numbers::pi_v<float>;
 
 constexpr unsigned height = 800;
 constexpr unsigned width = 800;
@@ -27,15 +27,15 @@ constexpr const char* title = "Shape movement 3D";
 constexpr const char* vertex_shader_path = SHADERS_PATH "/vertex.vert";
 constexpr const char* fragment_shader_path = SHADERS_PATH "/fragment.frag";
 
-constexpr float start_angle = pi / 2;
+constexpr float start_angle = fpi / 2;
 constexpr float low = -1;
 constexpr float high = 1;
 
-const math::Vector3 base1{std::cosf(start_angle), low, std::sinf(start_angle)};
-const math::Vector3 base2{std::cosf(start_angle + 2.f * pi / 3), low,
-                          std::sinf(start_angle + 2 * pi / 3)};
-const math::Vector3 base3{std::cosf(start_angle - 2 * pi / 3), low,
-                          std::sinf(start_angle - 2 * pi / 3)};
+const math::Vector3 base1{std::cos(start_angle), low, std::sin(start_angle)};
+const math::Vector3 base2{std::cos(start_angle + 2.f * fpi / 3.f), low,
+                          std::sin(start_angle + 2 * fpi / 3.f)};
+const math::Vector3 base3{std::cos(start_angle - 2 * fpi / 3.f), low,
+                          std::sin(start_angle - 2 * fpi / 3.f)};
 const math::Vector3 top{(base1.x + base2.x + base3.x) / 3.f, high,
                         (base1.z + base2.z + base3.z) / 3.f};
 
@@ -129,8 +129,8 @@ void start() {
 
     const math::Matrix rotate = math::Matrix::rotate4x4(0, 1, 0, x);
     const math::Matrix translate = math::Matrix::translate4x4(
-        2 * cos(x / 2 - pi), 0,
-        -(max / 2) * sin(x / 2 - pi) - (max / 2) - 3.5);
+        2 * cos(x / 2 - fpi), 0,
+        -(max / 2) * sin(x / 2 - fpi) - (max / 2) - 3.5);
     const math::Matrix projection = math::Matrix::perspective(
         std::numbers::pi / 4, static_cast<double>(width) / height, min, max);
 
@@ -142,8 +142,8 @@ void start() {
                     position.pointer());
 
     float r = std::fabs(std::sin(x));
-    float g = std::fabs(std::sin(x + 2.0f * pi / 3.0f));
-    float b = std::fabs(std::sin(x + 4.0f * pi / 3.0f));
+    float g = std::fabs(std::sin(x + 2.0f * fpi / 3.0f));
+    float b = std::fabs(std::sin(x + 4.0f * fpi / 3.0f));
     shader_program.setUniformVector3("color", r, g, b);
 
     glDrawArrays(GL_TRIANGLES, 0, vertices.getRows());
